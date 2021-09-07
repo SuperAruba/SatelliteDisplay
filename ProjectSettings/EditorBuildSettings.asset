@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/TemLight.unity
+    guid: 68b2c6e7c9664364380adfdbbaaeca1c
   m_configObjects: {}

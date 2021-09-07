@@ -13,10 +13,13 @@ public class UIManager : MonoBehaviour
     public Parity parity = Parity.None;//效验位
     public int dataBits = 8;//数据位
     public StopBits stopBits = StopBits.One;//停止位
+    public GameObject StartButton;
+    public GameObject OverButton;
     SerialPort sp = null;
     public List<byte> listReceive = new List<byte>();
     char[] strchar = new char[100];//接收的字符信息转换为字符数组信息
     string str;
+    private bool changeFlag;
 
     void Start()
     {
@@ -121,5 +124,22 @@ public class UIManager : MonoBehaviour
             sp.Write(dataStr);
 
         }
+    }
+
+    public void StartGame()
+    {
+        StartButton.gameObject.SetActive(false);
+        OverButton.gameObject.SetActive(true);
+        WriteData("A");
+    }
+    public void RecoveryStatus()
+    {
+        StartButton.gameObject.SetActive(true);
+        OverButton.gameObject.SetActive(false);
+        WriteData("B");
+    }
+    public void Quit()
+    {
+        Application.Quit();
     }
 }
