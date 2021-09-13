@@ -6,6 +6,10 @@ public class DragTest : MonoBehaviour
 {
     private Vector3 screenPos;
     private Vector3 offset;
+    void Start()
+    {
+
+    }
     void OnMouseDown()
     {
         screenPos = Camera.main.WorldToScreenPoint(transform.position);//获取物体的屏幕坐标     
