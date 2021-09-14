@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 7ebb55e1f0e46a847a962c9584207287
 ModelImporter:
-  serializedVersion: 19301
+  serializedVersion: 26
   internalIDToNameTable: []
   externalObjects:
   - first:
@@ -20,7 +20,7 @@ ModelImporter:
       name: Dunya_Shader
     second: {fileID: 2100000, guid: 68404c7151f48a74d922873da2e53e8b, type: 2}
   materials:
-    materialImportMode: 1
+    importMaterials: 1
     materialName: 2
     materialSearch: 0
     materialLocation: 1
@@ -58,7 +58,6 @@ ModelImporter:
     importBlendShapes: 1
     importCameras: 1
     importLights: 1
-    fileIdsGeneration: 2
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
@@ -85,6 +84,7 @@ ModelImporter:
     normalSmoothingSource: 0
   referencedClips: []
   importAnimation: 1
+  copyAvatar: 0
   humanDescription:
     serializedVersion: 3
     human: []
@@ -99,13 +99,11 @@ ModelImporter:
     globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
-    hasExtraRoot: 0
+    hasExtraRoot: 1
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  autoGenerateAvatarMappingIfUnspecified: 1
-  animationType: 2
+  animationType: 1
   humanoidOversampling: 1
-  avatarSetup: 0
   additionalBone: 0
   userData: 
   assetBundleName: 

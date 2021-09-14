@@ -19,7 +19,8 @@ public class AutoMove : MonoBehaviour
                 Destroy(GetComponent<DragTest>());
                 transform.position = Vector3.Lerp(transform.position, FixedPosition, 1);
 
-                transform.GetChild(0).GetComponent<SpectrumController>().enabled = true ;
+                transform.GetChild(0).GetComponent<SpectrumController>().enabled = true;
+                transform.Find("cloud").gameObject.SetActive(true);
                 weixing.DisplayZoomButton();
                 isAdsorbed = true;
             }

@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/TemLight.unity
-    guid: 68b2c6e7c9664364380adfdbbaaeca1c
+    path: Assets/Scenes/Start.unity
+    guid: f1ca07509745d5f4b8cacdf6116a3ec2
+  - enabled: 1
+    path: Assets/Scenes/SatelliteMain.unity
+    guid: 62e617f4e64208747a2eefefc03c5f6a
   m_configObjects: {}

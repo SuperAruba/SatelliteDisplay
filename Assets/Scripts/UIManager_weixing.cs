@@ -1,42 +1,58 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class UIManager_weixing : MonoBehaviour
 {
-    public GameObject[] Satellites;
+    public GameObject[] SatellitePrefabs;
+    public Transform Satellites;
+    public GameObject NextPlaceButton;
     public GameObject Earth;
+    public GameObject ZoomButton;
+    public GameObject PlaceButton;
     public Dictionary<string, Vector3[]> PlacesAndPositions;
     public Dictionary<string, int[]> PlacesAndScales;
     public Vector3[] SatellitePositions;
-    
+    public GameObject SuccessText;
+    public GameObject FailText;
+
+    private float TotalTime = 60f;
+    public Text GameCountTimeText;
     private Dictionary<string, Vector3> EarthAngles;//记录地点对应的旋转角度
     private GameObject currentSatellite;
 
-    
+    private string[] places;
     private bool startSpin;//选择地点时旋转控制
+    private bool isStarted;
     private string currentPlace;
-    private int index = 0;
+    private int satelliteIndex = 0;
+    private int placeIndex = 0;
     
     // Start is called before the first frame update
     void Start()
     {
+        places = new string[] {"beijing", "baxiliya", "kailuo", "huashengdun" };
         EarthAngles = new Dictionary<string, Vector3>();
         PlacesAndScales = new Dictionary<string, int[]>();
         PlacesAndPositions = new Dictionary<string, Vector3[]>();
         EarthAngles.Add("beijing",new Vector3(0, 265.99f, 0));
-        EarthAngles.Add("baxi", new Vector3(0, 111.54f, 0));
+        EarthAngles.Add("baxiliya", new Vector3(0, 111.54f, 0));
         EarthAngles.Add("kailuo", new Vector3(0, 201.57f, 0));
         EarthAngles.Add("huashengdun", new Vector3(0, 77.08f, 0));
 
         PlacesAndScales.Add("beijing", new int[] { 400, 200, 300 });
         PlacesAndPositions.Add("beijing", new Vector3[] { new Vector3(-61.2f, 37.9f, -119.4f), new Vector3(25.7f, 81.6f, -122.9f), new Vector3(30.5f, 51.98f, -125f) });
-        PlacesAndScales.Add("baxi", new int[] { 500, 500, 500 });
-        PlacesAndPositions.Add("baxi", new Vector3[] { new Vector3(43.87f, 67.7f, -119.4f), new Vector3(-29.1f, -5.82f, -122.9f), new Vector3(31.4f, -60.24f, -125f) });
+        PlacesAndScales.Add("baxiliya", new int[] { 500, 500, 500 });
+        PlacesAndPositions.Add("baxiliya", new Vector3[] { new Vector3(43.87f, 67.7f, -119.4f), new Vector3(-29.1f, -5.82f, -122.9f), new Vector3(31.4f, -60.24f, -125f) });
         PlacesAndScales.Add("kailuo", new int[] { 500, 400, 500 });
         PlacesAndPositions.Add("kailuo", new Vector3[] { new Vector3(-118.7f, 67.7f, -119.4f), new Vector3(7.4f, 32.81f, -122.9f), new Vector3(-10.6f, 94.9f, -125f) });
         PlacesAndScales.Add("huashengdun", new int[] {300,300,500});
         PlacesAndPositions.Add("huashengdun",new Vector3[] { new Vector3(65, 85.65f, -119.4f), new Vector3(-6.23f, 46.56f, -122.9f), new Vector3(-29f, 89f,-125f) });
+        SpinEarth(places[placeIndex]);
+        isStarted = true;
+        StartCoroutine(Time());
     }
 
     // Update is called once per frame
@@ -48,12 +64,27 @@ public class UIManager_weixing : MonoBehaviour
         }
         
     }
+
+    IEnumerator Time()
+    {
+        while (TotalTime >= 0 && isStarted)
+        {
+            GameCountTimeText.text = TotalTime.ToString();
+            yield return new WaitForSeconds(1);
+            TotalTime--;
+        }
+        if (TotalTime <= 0)
+        {
+            Failed();
+        }    
+    }
     public void SpinEarth(string place)
     {
         currentPlace = place;
         startSpin = true;
 
         InstantiateSatellites();
+        HidePlaceButton();
         //Earth.transform.localEulerAngles = Vector3.Lerp(Earth.transform.localEulerAngles, placePositions[place], 1);
     }
 
@@ -72,26 +103,72 @@ public class UIManager_weixing : MonoBehaviour
     }
     public void DisplayZoomButton()
     {
-
+        ZoomButton.SetActive(true);
     }
 
     public void HideZoomButton()
     {
-
+        ZoomButton.SetActive(false);
     }
 
+    public void DisplayPlaceButton()
+    {
+        PlaceButton.SetActive(true);
+    }
+    public void HidePlaceButton()
+    {
+        PlaceButton.SetActive(false);
+    }
     private void InstantiateSatellites()
     {
-        if (index < 3)
+        if (satelliteIndex < 3)
         {
-            currentSatellite = Instantiate(Satellites[index]);
+            currentSatellite = Instantiate(SatellitePrefabs[satelliteIndex], Satellites);
             currentSatellite.GetComponent<AutoMove>().weixing = this;
-            currentSatellite.GetComponent<AutoMove>().FixedScale = PlacesAndScales[currentPlace][index];
-            currentSatellite.GetComponent<AutoMove>().FixedPosition = PlacesAndPositions[currentPlace][index];
-            Debug.Log(index);
-            Debug.Log(PlacesAndPositions[currentPlace][index]);
-            index++;
+            currentSatellite.GetComponent<AutoMove>().FixedScale = PlacesAndScales[currentPlace][satelliteIndex];
+            currentSatellite.GetComponent<AutoMove>().FixedPosition = PlacesAndPositions[currentPlace][satelliteIndex];
+            satelliteIndex++;
+        }
+        else
+        {
+            Earth.transform.Find(places[placeIndex]).gameObject.SetActive(true);
+            if (placeIndex < places.Length - 1)
+            {
+                NextPlaceButton.SetActive(true);
+            }
+            else
+            {
+                Succeeded();
+            }
+            satelliteIndex = 0;
         }
         HideZoomButton();
+    }
+
+    public void OnePlaceOver()
+    {
+        NextPlaceButton.SetActive(false);
+        for (int i = 0; i < Satellites.childCount; i++)
+        {
+            Destroy(Satellites.GetChild(i).gameObject);          
+        }
+        placeIndex++;
+        SpinEarth(places[placeIndex]);     
+    }
+
+    public void Succeeded()
+    {
+        isStarted = false;
+        SuccessText.SetActive(true);
+    }
+    public void Failed()
+    {
+        isStarted = false;
+        FailText.SetActive(true);
+    }
+
+    public void Restart()
+    {
+        SceneManager.LoadScene("SatelliteMain");
     }
 }
