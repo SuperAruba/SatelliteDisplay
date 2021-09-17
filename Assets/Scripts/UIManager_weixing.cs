@@ -17,7 +17,7 @@ public class UIManager_weixing : MonoBehaviour
     public Vector3[] SatellitePositions;
     public GameObject SuccessText;
     public GameObject FailText;
-
+    public GameObject MainBG;
     private float TotalTime = 60f;
     public Text GameCountTimeText;
     private Dictionary<string, Vector3> EarthAngles;//记录地点对应的旋转角度
@@ -25,11 +25,17 @@ public class UIManager_weixing : MonoBehaviour
 
     private string[] places;
     private bool startSpin;//选择地点时旋转控制
-    private bool isStarted;
+    private bool isStarted;//游戏时限计数器得判断
+    private bool isEntered;//操作计数器得判断
     private string currentPlace;
     private int satelliteIndex = 0;
     private int placeIndex = 0;
-    
+
+
+    public float maxTimeOffset = 10;//检测时间间隔
+    private float lasterTime;
+    private float nowTime;
+    private float offsetTime;
     // Start is called before the first frame update
     void Start()
     {
@@ -49,12 +55,17 @@ public class UIManager_weixing : MonoBehaviour
         PlacesAndScales.Add("kailuo", new int[] { 500, 400, 500 });
         PlacesAndPositions.Add("kailuo", new Vector3[] { new Vector3(-118.7f, 67.7f, -119.4f), new Vector3(7.4f, 32.81f, -122.9f), new Vector3(-10.6f, 94.9f, -125f) });
         PlacesAndScales.Add("huashengdun", new int[] {300,300,500});
-        PlacesAndPositions.Add("huashengdun",new Vector3[] { new Vector3(65, 85.65f, -119.4f), new Vector3(-6.23f, 46.56f, -122.9f), new Vector3(-29f, 89f,-125f) });
+        PlacesAndPositions.Add("huashengdun",new Vector3[] { new Vector3(65, 85.65f, -119.4f), new Vector3(-6.23f, 46.56f, -122.9f), new Vector3(-29f, 89f,-125f) });  
+    }
+    public void StartGame()
+    {
+        lasterTime = Time.time;
+        MainBG.SetActive(false);
         SpinEarth(places[placeIndex]);
         isStarted = true;
-        StartCoroutine(Time());
+        isEntered = true;
+        StartCoroutine(CountTime());
     }
-
     // Update is called once per frame
     void Update()
     {
@@ -62,10 +73,43 @@ public class UIManager_weixing : MonoBehaviour
         {
             Earth.transform.localEulerAngles = Vector3.Lerp(Earth.transform.localEulerAngles, EarthAngles[currentPlace], 0.1f);
         }
-        
+        if (isEntered)
+        {
+            nowTime = Time.time;
+            if (Input.anyKey)
+            {
+                lasterTime = nowTime;
+            }
+            offsetTime = Mathf.Abs(nowTime - lasterTime);
+            if (offsetTime > maxTimeOffset)
+            {
+                ReturnSence();
+            }
+        }
     }
-
-    IEnumerator Time()
+    private void ResetSence()
+    {
+        isStarted = false;
+        NextPlaceButton.SetActive(false);
+        HidePlaceButton();
+        HideZoomButton();
+        SuccessText.SetActive(false);
+        FailText.SetActive(false);
+        for (int i = 1; i < Earth.transform.childCount; i++)
+        {
+            Earth.transform.GetChild(i).gameObject.SetActive(false);
+        }
+        for (int i = 0; i < Satellites.childCount; i++)
+        {
+            Destroy(Satellites.GetChild(i).gameObject);
+        }
+        TotalTime = 60f;
+        GameCountTimeText.text = TotalTime.ToString();
+        placeIndex = 0;
+        satelliteIndex = 0;
+        startSpin = false;
+    }
+    IEnumerator CountTime()
     {
         while (TotalTime >= 0 && isStarted)
         {
@@ -85,7 +129,6 @@ public class UIManager_weixing : MonoBehaviour
 
         InstantiateSatellites();
         HidePlaceButton();
-        //Earth.transform.localEulerAngles = Vector3.Lerp(Earth.transform.localEulerAngles, placePositions[place], 1);
     }
 
     public void SatelliteOver()
@@ -169,6 +212,13 @@ public class UIManager_weixing : MonoBehaviour
 
     public void Restart()
     {
-        SceneManager.LoadScene("SatelliteMain");
+        ResetSence();
+        StartGame();
+    }
+    public void ReturnSence()
+    {
+        isEntered = false;
+        MainBG.SetActive(true);
+        ResetSence();     
     }
 }
